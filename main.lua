@@ -45,15 +45,18 @@ function print_tree2(node)
 	love.graphics.setColor(color[4])
 	print_tree2(node.quadnode[rb])
 end
+
+local dt1 = 0
 function love.draw()	
 	i = 0
 	love.graphics.setColor(color[0])
-	print_tree2(mynode)
+	--print_tree2(mynode)
+	love.graphics.print(dt1 * 100, 20, 10)
 	
 end
 
 function love.update(dt)
-
+	dt1 = dt1 + dt
 end
 
 function love.mousepressed(x, y, button)
