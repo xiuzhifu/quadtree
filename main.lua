@@ -9,8 +9,13 @@
 -----------------------
 require "scenemgr"
 
+local a = nil
 function love.load()
 	love.window.setMode(1000, 800, {resizable=true, vsync=false, minwidth=400, minheight=300})
+	a = actor.new(500, 500, 20, 20)
+	actor.move(a, 20, 10)
+	scenemgr.init(1000, 800, 5)
+	scenemgr.add_actor(a)
 end
 local rect = {left = 0, top = 0, right = 1000, bottom = 800}
 
@@ -31,7 +36,6 @@ function print_tree2(node)
 	else
 		return
 	end
-
 	if not node.quadnode then 
 		i = i + 1	
 		love.graphics.print(i, node.rect.left + 5, node.rect.top + 5)
@@ -51,12 +55,20 @@ function love.draw()
 	i = 0
 	love.graphics.setColor(color[0])
 	--print_tree2(mynode)
-	love.graphics.print(dt1 * 100, 20, 10)
-	
+	if scenemgr.actorlist then
+		for i, v in ipairs(scenemgr.actorlist) do
+			love.graphics.rectangle("line", v.x, v.y, v.w, v.h)
+		end
+	end
+	--love.graphics.print(dt1 * 100, 20, 10)
 end
 
 function love.update(dt)
 	dt1 = dt1 + dt
+	if dt1 > 1000 then
+		scenemgr.update_actor()
+		dt1 = 0
+	end
 end
 
 function love.mousepressed(x, y, button)

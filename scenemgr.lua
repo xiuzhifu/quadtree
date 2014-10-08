@@ -1,22 +1,16 @@
-local actor = {
-	x = 0,
-	y = 0,
-	w = 1,
-	h = 1, 
-	position = 0,
-	speed = 0,
-}
-
+actor = {}
 function actor.new(x, y, w, h)
 	local t = {}
-	setmetetable(t, actor)
 	t.x = x
 	t.y = y
 	t.w = w
 	t.h = h
 	t.s = 0
-	actor.rect = {left = x, right = x + w, top = y, bottom = y + h}
-	
+	t.position = 0
+	t.speed = 0
+	t.rect = {left = x, right = x + w, top = y, bottom = y + h}
+	setmetatable(t, actor)
+	return t
 end
 
 function actor:stop()
@@ -42,17 +36,14 @@ local scenenode = {
 
 scenemgr = {
 	actorlist = {},
-	actornode = nil
+	actornode = {}
 
 }
 
-function scenemgr:init(w, h)
-	local t = {}
-	--setmetetable(t, scenenode)
-	self.actornode = t
+function scenemgr:init(w, h, level)	 
 	local rect = {left = 0, top = 0, right = w, bottom = h}
-	node.rect = rect
-	split(self.actornode, rect)
+	scenemgr.actornode.rect = rect
+	split(scenemgr.actornode, rect, 5)
 end
 
 function split(node, r, level)
@@ -108,9 +99,9 @@ end
 --print_tree(scenemgr.firstnode)
 
 
-function scenemgr:add_actor(actor)
-	self.actorlist[#self.actorlist + 1] = actor
-	self.add_node(self.actornode, actor)
+function scenemgr.add_actor(actor)
+	scenemgr.actorlist[#scenemgr.actorlist + 1] = actor
+	scenemgr:add_node(actor)
 end
 
 function rectinrect(inrect, outrect)
@@ -142,19 +133,20 @@ function find_node(node, actor)
 end
 
 function scenemgr:add_node(actor)
-	local n = find_node(self.actornode, actor)
+	local n = find_node(scenemgr.actornode, actor)
+	if not n.actors then n.actors = {} end
 	n.actors[#n.actors + 1] = actor
 end
 
 function scenemgr:delete_actor(actor)
-	local n = find_node(self.actornode, actor)
-	for i, v in n.actors do
+	local n = find_node(scenemgr.actornode, actor)
+	for i, v in ipairs(n.actors) do
 		if v == actor then
 			table.remove(n, n.actors, i)
 			return
 		end
 	end
-	table.remove(self.actorlist, actor)
+	table.remove(scenemgr.actorlist, actor)
 end
 
 function scenemgr.update_actor(node)
