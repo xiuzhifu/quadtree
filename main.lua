@@ -12,10 +12,12 @@ require "scenemgr"
 local a = nil
 function love.load()
 	love.window.setMode(1000, 800, {resizable=true, vsync=false, minwidth=400, minheight=300})
-	a = actor.new(500, 500, 20, 20)
-	actor.move(a, 20, 10)
 	scenemgr.init(1000, 800, 5)
-	scenemgr.add_actor(a)
+	for i = 1, 360 do
+		a = actor.new(500, 500, 50, 50)
+		actor.move(a, i, 1)
+		scenemgr.add_actor(a)
+	end
 end
 local rect = {left = 0, top = 0, right = 1000, bottom = 800}
 
@@ -27,7 +29,7 @@ color[0] = {0, 255, 0, 255}
 color[1] = {255, 0, 0, 255}
 color[2] = {0, 0, 255, 255}
 color[3] = {255, 0, 0, 255}
-color[4] = {0, 0, 255, 255}
+color[4] = {0, 255, 255, 0}
 local i = 1
 function print_tree2(node)
 	if node.rect then 		
@@ -51,12 +53,20 @@ function print_tree2(node)
 end
 
 local dt1 = 0
+function drawrect(rect)
+	love.graphics.rectangle("line", rect.left, rect.top, 
+			rect.right - rect.left, rect.bottom - rect.top)
+end
 function love.draw()	
-	i = 0
+	drawrect(rr)
 	love.graphics.setColor(color[0])
+	--love.graphics.print(scenemgr.actornode.rect.right, 60, 10)
+	--love.graphics.print(scenemgr.actornode.rect.bottom, 20, 10)
+	
 	--print_tree2(mynode)
 	if scenemgr.actorlist then
 		for i, v in ipairs(scenemgr.actorlist) do
+			love.graphics.setColor(color[i % 4])
 			love.graphics.rectangle("line", v.x, v.y, v.w, v.h)
 		end
 	end
@@ -64,8 +74,8 @@ function love.draw()
 end
 
 function love.update(dt)
-	dt1 = dt1 + dt
-	if dt1 > 1000 then
+	dt1 = dt1 + 1
+	if dt1 > 100 then
 		scenemgr.update_actor()
 		dt1 = 0
 	end

@@ -9,6 +9,7 @@ function actor.new(x, y, w, h)
 	t.position = 0
 	t.speed = 0
 	t.rect = {left = x, right = x + w, top = y, bottom = y + h}
+	t.changed = 0
 	setmetatable(t, actor)
 	return t
 end
@@ -20,6 +21,30 @@ end
 function actor:move(position, speed)
 	self.position = position
 	self.speed = speed
+end
+
+rr = {left = 100, right = 800, top = 100, bottom = 800}
+
+function point4inrect(x, y, w, h, outrect)
+	if (outrect.left <= x) or (outrect.top >= y) 
+		or (outrect.right >= x) or (outrect.bottom >= y) then
+		return true
+	else
+		return false
+	end
+end
+
+function actor:update()
+	self.s = self.s + self.speed
+	self.x = self.x + math.cos(self.position * 3.14 / 180) * self.s
+	self.y = self.y - math.sin(self.position * 3.14 / 180) * self.s
+	--point4inrect(self.x, self.y, self.w, self.h, rr)
+	self.changed = self.changed + 1
+	if self.changed > 20  then
+		self.position = (self.position + 180) % 360
+		self.s = 1
+		self.changed = 0
+	end
 end
 
  rt = 1
@@ -40,10 +65,10 @@ scenemgr = {
 
 }
 
-function scenemgr:init(w, h, level)	 
+function scenemgr.init(w, h, level)	 
 	local rect = {left = 0, top = 0, right = w, bottom = h}
 	scenemgr.actornode.rect = rect
-	split(scenemgr.actornode, rect, 5)
+	split(scenemgr.actornode, rect, level)
 end
 
 function split(node, r, level)
@@ -149,19 +174,11 @@ function scenemgr:delete_actor(actor)
 	table.remove(scenemgr.actorlist, actor)
 end
 
-function scenemgr.update_actor(node)
-	for i, v in node.actors do
-		v.s = v.s + s.speed
-		v.x = v.x + math.sin(v.position * math.pi / 180) * v.s
-		v.y = v.y + math.cos(v.position * math.pi / 180) * v.s
+function scenemgr.update_actor()
+	for i, v in ipairs(scenemgr.actorlist) do
+		actor.update(v)
 	
-	end
-	if node.level - 1 <= 0 then return end
-	print_tree(node.quadnode[rt])
-	print_tree(node.quadnode[lt])
-	print_tree(node.quadnode[lb])
-	print_tree(node.quadnode[rb])
-	
+	end	
 end
 
 function scenemgr.add_effect(effect)
